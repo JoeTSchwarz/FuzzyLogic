@@ -1,0 +1,52 @@
+// FuzzyVariables
+declare AirCon(min(-10d, -6d, -4d), low(-4d, -2d, 0), OFF(-0.25d, 0, 0.25d), high(0d, 2d, 4d), max(4d, 6d, 10d))
+declare room(cold(-20d, -5d, 5d), cool(2d, 10d, 20d), fair(19.5d, 20d, 21.5d), warm(21d, 23d, 25d), hot(24d, 30d, 40d))
+declare temp(cold(-20d, -5d, 5d), cool(2d, 10d, 20d), fair(19.5d, 20d, 21.5d), warm(21d, 23d, 25d), hot(24d, 30d, 40d))
+// get Samples from 'Java app' for room and AirCon
+room = this:tempB
+AirCon = this:stepB
+print "Before of FUZZY control."
+print "Outside house B: "+this:outsideB+" C. Room Temparature "+room+"C. Aircon scale:"+AirCon
+while * // endless
+  if room is cold then AirCon is max
+  if room is cool then AirCon is high
+  if room is fair then AirCon is OFF
+  if room is warm then AirCon is low
+  if room is hot  then AirCon is min
+  // FuzzyExpressions
+  if room is cold and AirCon is min then temp is cold
+  if room is cool and AirCon is min then temp is cold
+  if room is fair and AirCon is min then temp is cold
+  if room is warm and AirCon is min then temp is cool
+  if room is hot  and AirCon is min then temp is fair
+        
+  if room is cold and AirCon is low then temp is cold
+  if room is cool and AirCon is low then temp is cold
+  if room is fair and AirCon is low then temp is cool
+  if room is warm and AirCon is low then temp is fair
+  if room is hot  and AirCon is low then temp is warm
+        
+  if room is cold and AirCon is OFF then temp is cold
+  if room is cool and AirCon is OFF then temp is cool
+  if room is fair and AirCon is OFF then temp is fair
+  if room is warm and AirCon is OFF then temp is warm
+  if room is hot  and AirCon is OFF then temp is hot
+        
+  if room is cold and AirCon is high then temp is cool
+  if room is cool and AirCon is high then temp is fair
+  if room is fair and AirCon is high then temp is hot
+  if room is warm and AirCon is high then temp is hot
+  if room is hot  and AirCon is high then temp is hot
+        
+  if room is cold and AirCon is max then temp is warm
+  if room is cool and AirCon is max then temp is hot
+  if room is fair and AirCon is max then temp is hot
+  if room is warm and AirCon is max then temp is hot
+  if room is hot  and AirCon is max then temp is hot
+  // end of FuzzyExpression
+  AirCon = this.getStep(temp, 1)
+  room = temp
+  if room is fair break
+endwhile
+print "End of FUZZY control for House B:"
+print "Outside "+this:outsideB+" C. Room Temparature "+room+"C. Aircon scale:"+AirCon

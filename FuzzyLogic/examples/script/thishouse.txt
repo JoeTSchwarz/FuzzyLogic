@@ -1,0 +1,49 @@
+// FuzzyVariables
+declare scale(min(-10d, -7d, -4d), low(-4d, -2d, 0), OFF(-0.25d, 0, 0.25d), high(0d, 2d, 4d), max(4d, 7d, 10d))
+declare room(cold(-40d, -20d, 5d), cool(5d, 10d, 21d), fair(20d, 21d, 22d), warm(21d, 23d, 25d), hot(24d, 30d, 40d))
+declare temp(cold(-40d, -20d, 5d), cool(5d, 10d, 21d), fair(20d, 21d, 22d), warm(21d, 23d, 25d), hot(24d, 30d, 40d))
+// get Samples from 'Java app' for room and scale
+room = this:temp
+scale = this:scale
+print "Before of FUZZY control."
+print "Outside "+this:outside+" C. Room Temparature "+this:temp+"C. Aircon scale:"+this:scale
+// endless loop
+while *
+  if room is cold and scale is min temp is cold
+  if room is cool and scale is min temp is cold
+  if room is fair and scale is min temp is cool
+  if room is warm and scale is min temp is cool
+  if room is hot  and scale is min temp is fair
+        
+  if room is cold and scale is low temp is cold
+  if room is cool and scale is low temp is cold
+  if room is fair and scale is low temp is cool
+  if room is warm and scale is low temp is fair
+  if room is hot  and scale is low temp is warm
+        
+  if room is cold and scale is OFF temp is cold
+  if room is cool and scale is OFF temp is cool
+  if room is fair and scale is OFF temp is fair
+  if room is warm and scale is OFF temp is warm
+  if room is hot  and scale is OFF temp is hot
+        
+  if room is cold and scale is high temp is cool
+  if room is cool and scale is high temp is fair
+  if room is fair and scale is high temp is hot
+  if room is warm and scale is high temp is hot
+  if room is hot  and scale is high temp is hot
+        
+  if room is cold and scale is max temp is warm
+  if room is cool and scale is max temp is hot
+  if room is fair and scale is max temp is hot
+  if room is warm and scale is max temp is hot
+  if room is hot  and scale is max temp is hot
+
+  // save temp and scale
+  scale = this.adjust(temp)
+  room = this:temp 
+  if room is fair break
+endwhile
+print "End of FUZZY control:"
+print "Outside "+this:outside+" C. Room Temparature "+this:temp+" C. Aircon scale:"+this:scale
+this.print("End of FUZZY control. Room Temperature is now:", temp)

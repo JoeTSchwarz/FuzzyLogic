@@ -1,0 +1,82 @@
+declare AirCon(min(-10d, -6d, -4d), low(-4d, -2d, 0), OFF(-0.25d, 0, 0.25d), high(0d, 2d, 4d), max(4d, 6d, 10d))
+declare room(cold(-20d, -5d, 5d), cool(2d, 10d, 20d), fair(19.5d, 20d, 21.5d), warm(21d, 23d, 25d), hot(24d, 30d, 40d))
+declare temp(cold(-20d, -5d, 5d), cool(2d, 10d, 20d), fair(19.5d, 20d, 21.5d), warm(21d, 23d, 25d), hot(24d, 30d, 40d))
+// get Samples from 'Java app' for room and AirCon
+// declare FuzzyPrimitives
+double fTemp = this:temp
+double fStep = this:step
+string str = "Hello world"
+double x = 0
+// concate String String
+str = str + " and jFLe !"
+this.print(str)
+print "------Start FuzzyLogic computing------"
+this.print("RoomTemp:", fTemp)
+// loop until found...
+while fTemp < 20 || fTemp > 21
+  room = fTemp
+  if room is cold then AirCon is max
+  if room is cool then AirCon is high
+  if room is fair then AirCon is OFF
+  if room is warm then AirCon is low
+  if room is hot  then AirCon is min
+// simulate the method adjust
+// double x = temp < 5d? 1d:temp < 20d?0.5d:temp < 25d? -0.5:-1d;
+// step = d + x;
+  x = -1
+  if fTemp < 25
+    x = -0.5
+    this.print("Less than 25 RoomTemp:", fTemp)
+  endif
+  if fTemp < 20
+    x = 0.5
+    this.print("Less than 20 RoomTemp:", fTemp)
+  endif
+  if fTemp < 5
+    x = 1
+    this.print("Less than 5 RoomTemp:", fTemp)
+  endif
+  this.print("Before compute fStep:", fStep)
+  // compute FV + FuzzyPrimitive double
+  fStep = AirCon + x
+  this.print("After compute fStep:", fStep)
+  // set AirCon with defuzzied FV
+  AirCon = fStep
+  this:step = fStep
+  this.print("RoomTemp:", room)
+  // FuzzyExpressions
+  if room is cold and AirCon is min then temp is cold
+  if room is cool and AirCon is min then temp is cold
+  if room is fair and AirCon is min then temp is cold
+  if room is warm and AirCon is min then temp is cool
+  if room is hot  and AirCon is min then temp is fair
+        
+  if room is cold and AirCon is low then temp is cold
+  if room is cool and AirCon is low then temp is cold
+  if room is fair and AirCon is low then temp is cool
+  if room is warm and AirCon is low then temp is fair
+  if room is hot  and AirCon is low then temp is warm
+        
+  if room is cold and AirCon is OFF then temp is cold
+  if room is cool and AirCon is OFF then temp is cool
+  if room is fair and AirCon is OFF then temp is fair
+  if room is warm and AirCon is OFF then temp is warm
+  if room is hot  and AirCon is OFF then temp is hot
+        
+  if room is cold and AirCon is high then temp is cool
+  if room is cool and AirCon is high then temp is fair
+  if room is fair and AirCon is high then temp is warm
+  if room is warm and AirCon is high then temp is hot
+  if room is hot  and AirCon is high then temp is hot
+        
+  if room is cold and AirCon is max then temp is fair
+  if room is cool and AirCon is max then temp is warm
+  if room is fair and AirCon is max then temp is hot
+  if room is warm and AirCon is max then temp is hot
+  if room is hot  and AirCon is max then temp is hot
+  // end of FuzzyExpression
+  this:temp = temp
+  fTemp = temp
+  this.print("fTemp:", fTemp)
+endwhile
+this.achieve(fStep, fTemp)

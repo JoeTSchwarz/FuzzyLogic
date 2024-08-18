@@ -1,0 +1,73 @@
+// FuzzyVariables and their corresponding FuzzyData and FuzzyParm
+declare Distance(tooFarAhead(-620,-520,-420,-320), veryFarAhead(-330,-230,-130,-30), farAhead(-130,-14,-10,1),target(-1,0,1), farBehind(1,10,14,130),veryFarBehind(30,130,230,330),tooFarBehind(320,420,520,620))
+//
+declare Height(tooHigh(-620,-520,-420,-320),veryHigh(-330,-230,-130,-50),high(-130,-24,-16,1),goal(-1,0,1),low(1,16,24,130),veryLow(50,130,230,330), tooLow(320,420,520,620))
+//
+declare Obstacle(inFront(-100,-80,-20,-1),hit(-1,0,1),ahead(1,20,80,100))
+declare Maneuver(right(20,30,40),left(-20, -15, -10))
+//
+declare Speed(speedBACK(-3,-2.5,-2),slowBACK(-2,-1.5,-1),back(-1,-0.5,-0.1),standing(-0.1,0,0.1),fore(0.1,0.5,1),slowFORE(1,1.5,2),speedFORE(2,2.5,3))
+//
+double x = 0
+//
+do
+  // checck to obstacle
+  Obstacle = this.checkObstacle()
+  if (Obstacle is inFront) Maneuver is right
+  if (Obstacle is ahead) Maneuver is left
+  this:obstacle = Maneuver
+  //
+  this.computeDelta()
+  Height = this:deltaY
+  Distance = this:deltaX
+  //-------------------------------------AHEAD------------------------------------------------------
+  if ((Distance is tooFarAhead || Distance is veryFarAhead) && Height is tooHigh) Speed is speedFORE
+  if ((Distance is tooFarAhead || Distance is veryFarAhead) && Height is veryHigh) Speed is slowFORE
+  if ((Distance is tooFarAhead || Distance is veryFarAhead) && Height is high) Speed is slowFORE
+  //
+  if ((Distance is tooFarAhead || Distance is veryFarAhead) && Height is tooLow) Speed is speedFORE
+  if ((Distance is tooFarAhead || Distance is veryFarAhead) && Height is veryLow) Speed is slowFORE
+  if ((Distance is tooFarAhead || Distance is veryFarAhead) && Height is low) Speed is slowFORE
+  //
+  if (Distance is farAhead && Height is tooHigh) Speed is speedFORE
+  if (Distance is farAhead && Height is veryHigh) Speed is slowFORE
+  if (Distance is farAhead && Height is high) Speed is fore
+  //
+  if (Distance is farAhead && Height is tooLow) Speed is slowFORE
+  if (Distance is farAhead && Height is veryLow) Speed is slowFORE
+  if (Distance is farAhead && Height is low) Speed is fore
+  //------------------------------BEHIND-------------------------------------------------------------
+  if ((Distance is tooFarBehind || Distance is veryFarBehind) && Height is tooHigh) Speed is speedBACK
+  if ((Distance is tooFarBehind || Distance is veryFarBehind) && Height is veryHigh) Speed is slowBACK
+  if ((Distance is tooFarBehind || Distance is veryFarBehind) && Height is high) Speed is slowBACK
+  //
+  if ((Distance is tooFarBehind || Distance is veryFarBehind) && Height is tooLow) Speed is speedBACK
+  if ((Distance is tooFarBehind || Distance is veryFarBehind) && Height is veryLow) Speed is slowBACK
+  //if ((Distance is tooFarBehind || Distance is veryFarBehind) && Height is low) Speed is slowBACK
+  //
+  if (Distance is farBehind && Height is tooHigh) Speed is speedBACK
+  if (Distance is farBehind && Height is veryHigh) Speed is slowBACK
+  if (Distance is farBehind && Height is high) Speed is back
+  //
+  if (Distance is farBehind && Height is tooLow) Speed is speedBACK
+  if (Distance is farBehind && Height is veryLow) Speed is slowBACK
+  if (Distance is farBehind && Height is low) Speed is back
+  //----------------------------AT TARGET------------------------------------------------------------
+  if (Distance is target && (Height is tooHigh || Height is veryHigh)) Speed is slowFORE
+  if (Distance is target && Height is high) Speed is fore
+  //
+  if (Distance is target && (Height is tooLow || Height is veryLow)) Speed is slowBACK
+  if (Distance is target && Height is low) Speed is back
+  // ------------------------------------------------------------------------------------------------
+  if (Height is goal && (Distance is tooFarBehind || Distance is veryFarBehind)) Speed is slowFORE
+  if (Height is goal && Distance is farBehind) Speed is fore
+  if (Height is goal && (Distance is tooFarAhead || Distance is veryFarAhead)) Speed is slowBACK
+  if (Height is goal && Distance is farAhead) Speed is back
+  // ------------------------------------------------------------------------------------------------
+  if (Distance is target && Height is goal) Speed is standing
+  this:speed = Speed
+  x = this:home
+with x < 3 && x >= 0
+print "Mission completed"
+exit
+

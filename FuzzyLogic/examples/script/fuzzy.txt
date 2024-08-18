@@ -1,0 +1,30 @@
+double y = 2
+print "Y = "+y
+declare fv1(fd1(10, 20, 30),fd2(10, 20, 30, 40), fd3(50, 60, 70))
+declare fv2(fd1(10, 20, 30),fd2(10, 20, 30, 40), fd3(50, 60, 70))
+set fv2 = 3
+y = fv2
+if (y == 3) y = 1+fv2
+if (y == 4) fv1 is fd1
+else print "totally wrong"
+if (y == 4) print "1.true" 
+else print "1.false"
+//
+set fv2 = 20
+if (fv2 is fd1) print "2.true"
+fv2 = 30
+if (fv2 is fd1) 
+  print "3.true" 
+  fv1 is fd1
+  print "fv1 is set to "+fv1
+else 
+  print "3.false"
+  fv1 is fd1
+  print "Again fv1 is reset to "+fv1
+endif
+//
+print "Y = fv2 = "+y
+fv2 = 13
+print "new Y = fv2 = "+fv2
+y = (y * 5 + 6)/7
+print "final: ((y * 5) + 6)/7 = "+y+" Mission completed"
