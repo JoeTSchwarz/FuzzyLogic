@@ -6,11 +6,6 @@ double ftemp = this:tempA
 print "Inhouse A: "+ftemp
 while ftemp < 20 || ftemp > 22
   room = ftemp
-  if room is cold then AirCon is max
-  if room is cool then AirCon is high
-  if room is fair then AirCon is OFF
-  if room is warm then AirCon is low
-  if room is hot  then AirCon is min
   // FuzzyExpressions
   if room is cold and AirCon is min then temp is cold
   if room is cool and AirCon is min then temp is cold
