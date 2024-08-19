@@ -15,14 +15,9 @@ this.print("RoomTemp:", fTemp)
 // loop until found...
 while fTemp < 20 || fTemp > 22
   room = fTemp
-  if room is cold then AirCon is max
-  if room is cool then AirCon is high
-  if room is fair then AirCon is OFF
-  if room is warm then AirCon is low
-  if room is hot  then AirCon is min
-// simulate the method adjust
-// double x = temp < 5d? 1d:temp < 20d?0.5d:temp < 25d? -0.5:-1d;
-// step = d + x;
+  // simulate the method adjust
+  // double x = temp < 5d? 1d:temp < 20d?0.5d:temp < 25d? -0.5:-1d;
+  // step = d + x;
   x = -1
   if fTemp < 25
     x = -0.5
