@@ -4,7 +4,7 @@ declare temp(cold(-20d, -5d, 5d), cool(2d, 10d, 20d), fair(19.5d, 20d, 21.5d), w
 // set Samples to Java Global Variables
 double ftemp = this:tempA
 print "Inhouse A: "+ftemp
-while ftemp < 20 || ftemp > 21
+while ftemp < 20 || ftemp > 22
   room = ftemp
   if room is cold then AirCon is max
   if room is cool then AirCon is high
