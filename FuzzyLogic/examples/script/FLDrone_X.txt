@@ -1,20 +1,19 @@
-// FuzzyVariables and their corresponding FuzzyData and FuzzyParm
-declare Distance(tooFarAhead(-620,-520,-420,-320), veryFarAhead(-330,-230,-130,-30), farAhead(-130,-14,-10,1),target(-1,0,1), farBehind(1,10,14,130),veryFarBehind(30,130,230,330),tooFarBehind(320,420,520,620))
+declare Distance(tooFarAhead(-620,-470,-320), veryFarAhead(-330,-230,-130), farAhead(-130,-15,-10,-1),target(-1,0,1), farBehind(-1,10,15,130),veryFarBehind(130,230,330),tooFarBehind(320,470,620))
 //
-declare Height(tooHigh(-620,-520,-420,-320),veryHigh(-330,-230,-130,-50),high(-130,-24,-16,1),goal(-1,0,1),low(1,16,24,130),veryLow(50,130,230,330), tooLow(320,420,520,620))
+declare Height(tooHigh(-620,-470,-320),veryHigh(-330,-230,-130),high(-130,-24,-16,1),goal(-1,0,1),low(1,16,24,130),veryLow(130,230,330), tooLow(320,470,620))
 //
-declare Obstacle(inFront(-100,-80,-20,-1),hit(-1,0,1),ahead(1,20,80,100))
-declare Maneuver(right(20,30,40),left(-20, -15, -10))
+declare Obstacle(onLeft(-100,-80,-20,-1),hit(-1,0,1),onRight(1,20,80,100))
+declare Maneuver(toRight(20,30,40),toLeft(-20, -15, -10))
 //
 declare Speed(speedBACK(-3,-2.5,-2),slowBACK(-2,-1.5,-1),back(-1,-0.5,-0.1),standing(-0.1,0,0.1),fore(0.1,0.5,1),slowFORE(1,1.5,2),speedFORE(2,2.5,3))
 //
 double x = 0
 //
 do
-  // checck to obstacle
+  // check to obstacle
   Obstacle = this.checkObstacle()
-  if (Obstacle is inFront) Maneuver is right
-  if (Obstacle is ahead) Maneuver is left
+  if (Obstacle is onLeft) Maneuver is toRight
+  if (Obstacle is onRight) Maneuver is toLeft
   this:obstacle = Maneuver
   //
   this.computeDelta()
@@ -67,6 +66,7 @@ do
   if (Distance is target && Height is goal) Speed is standing
   this:speed = Speed
   x = this:home
+
 with x < 3 && x >= 0
 print "Mission completed"
 exit
