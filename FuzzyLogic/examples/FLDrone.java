@@ -347,7 +347,7 @@ public class FLDrone extends Application {
     }
     gc.setLineWidth(1);
     gc.setStroke(Color.YELLOW);
-    gc.strokeText("FuzzyLogic Controlled Drone - Joe Nartca (C) -", 124, 15);
+    gc.strokeText("FuzzyLogic Controlled Drone - Joe T. Schwarz (C) -", 124, 15);
     gc.strokeText(String.format("Speed %3.2f, Chopper %3.2f / %3.2f (cargo %3.2f / %3.2f)",
                                 speed, sX, sY, cX, cY), 108, 25);
     gc.setStroke(Color.CYAN);
