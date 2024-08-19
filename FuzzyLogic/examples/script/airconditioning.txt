@@ -13,7 +13,7 @@ this.print(str)
 print "------Start FuzzyLogic computing------"
 this.print("RoomTemp:", fTemp)
 // loop until found...
-while fTemp < 20 || fTemp > 21
+while fTemp < 20 || fTemp > 22
   room = fTemp
   if room is cold then AirCon is max
   if room is cool then AirCon is high
