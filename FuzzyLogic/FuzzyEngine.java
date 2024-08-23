@@ -291,7 +291,8 @@ public class FuzzyEngine extends FuzzyFrame {
       String op = fExp[idx++];
       if ("if".equals(op)) {
         cnt = 0;
-        if (isFuzzy()) { // fuzzy
+        boolean boo = isFuzzy();
+        if (boo) {
           result = synLeft();
           if (cnt > 0) throw new Exception("Unbalanced bracket pair at line:"+atLine( ));
           --idx; // back to statement
@@ -305,17 +306,32 @@ public class FuzzyEngine extends FuzzyFrame {
         int ix = atEnd("if", "endif"); // index of endif
         if (ie < 0 && ix < 0) { // no else and no endif
           if (isFuzzy()) synRight(result); // Fuzzy on right
-          else if (result == 0) idx = next(fExp[idx], idx+1);
+          else if (result == 0) idx = next(idx+1);
         } else { // block with else or endif or both
           if (result == 0) { // conditions failed
             if (ie > 0) idx = ie;
             else { // no 'else', endif ?
               if (ix > 0) idx = ix; // endif
-              else idx = next(fExp[idx], idx+1);
+              else idx = skip(idx);
             }
-          } else { // conditions met
+            if (boo) {
+              ix = idx;
+              while (ia < ix) { // Fuzzy correction?
+                if ("if".equals(fExp[ia]) || "break".equals(fExp[ia])) break;
+                if (FVs.containsKey(fExp[ia++]) && ("is".equals(fExp[ia]) || "not".equals(fExp[ia]) ||
+                    "some".equals(fExp[ia]) || "very".equals(fExp[ia]))) {
+                  idx = ia - 1;
+                  synRight(0);
+                  ia = idx;
+                }
+              }
+              // restore idx
+              idx = ix;
+            }
+          }
+        } else { // conditions met
             if (ie > 0) { // else block
-              if (ix < 0) ix = next(fExp[ie], ie+1);
+              if (ix < 0) ix = skip(ie);
               ELSE.push(ix); // continue index @else
             }
           }
@@ -520,15 +536,31 @@ public class FuzzyEngine extends FuzzyFrame {
       }
     }
   }
+  // Recursive skip if, do and while
+  private int skip(int ix) throws Exception {
+    if ("if".equals(fExp[ix])) {
+      idx = ix+1; // set index
+      int ie = atEnd("if", "else");
+      int is = atEnd("if", "endif");
+      if (is > 0) return is;
+      if (ie < 0) return next(idx+1);  
+      return skip(ie);
+    } 
+    else if ("do".equals(fExp[ix])) return atEnd("do", "with");
+    else if ("while".equals(fExp[ix])) return atEnd("while", "endwhile");
+    return ix;
+  }
   // next subsequent Statement
-  private int next(String op, int ix) {
+  private int next(int ix) {
     for (String c : commands) if (c.equals(fExp[ix])) return ix;
     for (int i; ix < fExp.length; ++ix) {
-      op = fExp[ix]; // check forcommand then Operator
+      String op = fExp[ix]; // check forcommand then Operator
       for (String c : commands) if (c.equals(op)) return ix;
       for (i = 0; i < OPs.length; ++i) if (OPs[i].equals(op)) break;
       if (i == OPs.length) { // no Operator found
-        op = fExp[++ix]; // check for Statement, JO/FV
+        ++ix; // next token
+        if (ix == fExp.length) return ix;
+        op = fExp[ix]; // check for Statement, JO/FV
         for (String c : commands) if (c.equals(op)) return ix;
         if (op.indexOf(":") > 0 || op.indexOf(".") > 0 ||
             JOs.containsKey(op) || FVs.containsKey(op)) return ix;
