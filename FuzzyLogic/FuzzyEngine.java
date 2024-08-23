@@ -306,7 +306,7 @@ public class FuzzyEngine extends FuzzyFrame {
         int ix = atEnd("if", "endif"); // index of endif
         if (ie < 0 && ix < 0) { // no else and no endif
           if (isFuzzy()) synRight(result); // Fuzzy on right
-          else if (result == 0) idx = next(idx+1);
+          else if (result == 0) idx = skip(idx);
         } else { // block with else or endif or both
           if (result == 0) { // conditions failed
             if (ie > 0) idx = ie;
@@ -536,20 +536,6 @@ public class FuzzyEngine extends FuzzyFrame {
       }
     }
   }
-  // Recursive skip if, do and while
-  private int skip(int ix) throws Exception {
-    if ("if".equals(fExp[ix])) {
-      idx = ix+1; // set index
-      int ie = atEnd("if", "else");
-      int is = atEnd("if", "endif");
-      if (is > 0) return is;
-      if (ie < 0) return next(idx+1);  
-      return skip(ie);
-    } 
-    else if ("do".equals(fExp[ix])) return atEnd("do", "with");
-    else if ("while".equals(fExp[ix])) return atEnd("while", "endwhile");
-    return ix;
-  }
   // next subsequent Statement
   private int next(int ix) {
     for (String c : commands) if (c.equals(fExp[ix])) return ix;
@@ -568,6 +554,42 @@ public class FuzzyEngine extends FuzzyFrame {
       
     }
     return ix;
+  }
+  // Recursive skip if, do and while
+  private int skip(int ix) throws Exception {
+    idx = ix+1; // set Token-Index
+    if ("if".equals(fExp[ix])) { 
+      ix = atEnd("if", "endif");
+      if (ix > 0) return ix;
+      ix = atEnd("if", "else");
+      if (ix > 0) return skip(ix);
+      cx = 0; // no else, no endif
+      ix = ifLeft(idx);
+      if (cx == 0) return next(ix+1);
+      throw new Exception("Unbalanced bracket pair at line:"+atLine( ));
+    } 
+    else if ("do".equals(fExp[ix])) return atEnd("do", "with");
+    else if ("while".equals(fExp[ix])) return atEnd("while", "endwhile");
+    return next(idx);
+  }
+  //
+  private int ifLeft(int ix) throws Exception {
+    ++cx;
+    ix = ifValue(ix);
+    char C = fExp[ix++].charAt(0);
+    while (ix < fExp.length && (C == '&' || C == '|')) {
+      ix = ifValue(ix);
+      if (C != '&' && C != '|') throw new Exception("Unknown operation:"+C+" at line:"+atLine( ));
+      C = fExp[ix++].charAt(0);
+    }
+    --cx;
+    return ix;
+  }
+  private int ifValue(int ix) throws Exception {
+    String op = fExp[ix++];
+    if (op.charAt(0) == '(') return ifLeft(ix);
+    if (FVs.containsKey(op) || JOs.containsKey(op)) return ix+2;
+    throw new Exception("Unknown "+op+" at line:"+atLine( ));
   }
   //
   private int cnt;
