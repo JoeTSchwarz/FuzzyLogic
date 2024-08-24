@@ -536,8 +536,23 @@ public class FuzzyEngine extends FuzzyFrame {
       }
     }
   }
-  // next subsequent Statement
-  private int next(int ix) {
+  // Recursive skip if, do and while
+  private int skip(int ix) throws Exception {
+    idx = ix+1; // set Token-Index
+    if ("if".equals(fExp[ix])) { 
+      ix = atEnd("if", "endif");
+      if (ix > 0) return ix;
+      ix = atEnd("if", "else");
+      if (ix > 0) return skip(ix);
+      cx = 0; // no else, no endif
+      ix = ifLeft(idx);
+      if (cx == 0) ++ix; // fall thru to next statement
+      else throw new Exception("Unbalanced bracket pair at line:"+atLine( ));
+    } 
+    else if ("do".equals(fExp[ix])) return atEnd("do", "with");
+    else if ("while".equals(fExp[ix])) return atEnd("while", "endwhile");
+    else ++ix;
+    // next statement after if without else and endif
     for (String c : commands) if (c.equals(fExp[ix])) return ix;
     for (int i; ix < fExp.length; ++ix) {
       String op = fExp[ix]; // check forcommand then Operator
@@ -550,27 +565,9 @@ public class FuzzyEngine extends FuzzyFrame {
         for (String c : commands) if (c.equals(op)) return ix;
         if (op.indexOf(":") > 0 || op.indexOf(".") > 0 ||
             JOs.containsKey(op) || FVs.containsKey(op)) return ix;
-      }
-      
+      }      
     }
     return ix;
-  }
-  // Recursive skip if, do and while
-  private int skip(int ix) throws Exception {
-    idx = ix+1; // set Token-Index
-    if ("if".equals(fExp[ix])) { 
-      ix = atEnd("if", "endif");
-      if (ix > 0) return ix;
-      ix = atEnd("if", "else");
-      if (ix > 0) return skip(ix);
-      cx = 0; // no else, no endif
-      ix = ifLeft(idx);
-      if (cx == 0) return next(ix+1);
-      throw new Exception("Unbalanced bracket pair at line:"+atLine( ));
-    } 
-    else if ("do".equals(fExp[ix])) return atEnd("do", "with");
-    else if ("while".equals(fExp[ix])) return atEnd("while", "endwhile");
-    return next(idx);
   }
   //
   private int ifLeft(int ix) throws Exception {
