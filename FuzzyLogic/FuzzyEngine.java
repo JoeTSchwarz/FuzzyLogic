@@ -70,11 +70,7 @@ public class FuzzyEngine extends FuzzyFrame {
              .replace("&&", " && ").replace(" and ", " && ")
              .replace("||", " || ").replace(" or ", " || ")
              .replace("\t", " ").replace("\n", " ")
-             .split(" ");
-      // remove all empty tokens
-      ArrayList<String> lst = new ArrayList<>(fExp.length);
-      for (String s : fExp) if (s.length() > 0) lst.add(s);
-      fExp = lst.toArray(new String[lst.size()]);
+             .trim().split("[ ]+");
       old = script;
       syntax( );
     }
@@ -192,8 +188,7 @@ public class FuzzyEngine extends FuzzyFrame {
       String S = fuzzy.substring(a, e);
       fuzzy = fuzzy.replace(S, ""); // remove this 'declare'
       S = S.replaceAll("\\,", " \\, ").replaceAll("\\)", " \\) ").replaceAll("\\(", " \\( ");
-      while (S.indexOf("  ") >= 0) S = S.replaceAll("  ", " ");
-      fExp = S.trim().split(" ");             
+      fExp = S.trim().split("[ ]+");
       buildFV();
     }
     idx = 0;
