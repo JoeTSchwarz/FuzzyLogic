@@ -364,7 +364,35 @@ public class FuzzyEngine extends FuzzyFrame {
       } else if ("endwhile".equals(op)) {
         idx = LOOP.peek();
       } else if ("break".equals(op)) {
-        aBreak();
+        // check Label of while/do loop
+        if (LABEL.containsKey(fExp[idx])) { 
+          int q = LOOP.size();
+          int p = q - LOOP.search(LABEL.get(fExp[idx]));
+          if (p >= 0) { // include itself: i <= p
+            for (int i = q; i > p; --i) {
+              idx = BREAK.pop();
+              LOOP.pop();
+            }
+          } else
+            throw new Exception("Unknown Label @break "+fExp[idx]+" at line:"+atLine());
+        } else {
+          if (BREAK.isEmpty())
+            throw new Exception("\"break\" without \"while\" or \"do\" at line:"+atLine());
+          idx = BREAK.pop();
+          LOOP.pop();
+        }
+      } else if ("continue".equals(op)) {
+        // check Label of while/do loop
+        if (LABEL.containsKey(fExp[idx])) { 
+          int p = LOOP.search(LABEL.get(fExp[idx]));
+          if (p >= 0) LOOP.get(p);
+          else
+            throw new Exception("Unknown Label @continue "+fExp[idx]+" at line:"+atLine());
+        } else {
+          if (LOOP.isEmpty())
+            throw new Exception("\"continue\" without \"while\" or \"do\" at line:"+atLine());
+          idx = LOOP.peek();
+        }
       } else if ("print".equals(op)) {
          print();
       } else if (op.indexOf(":") > 0) { // Java Variable
@@ -471,25 +499,6 @@ public class FuzzyEngine extends FuzzyFrame {
         idx = BREAK.pop();        
       }
     }
-  }
-  // break of do, while
-  private void aBreak( ) throws Exception {
-    // check Label of while/do loop
-    if (LABEL.containsKey(fExp[idx])) { 
-      int q = LOOP.size();
-      int p = q - LOOP.search(LABEL.get(fExp[idx]));
-      if (p >= 0) { // include itself: i <= p
-        for (int i = q; i > p; --i) {
-          idx = BREAK.pop();
-          LOOP.pop();
-        }
-      }
-      return;
-    }
-    if (BREAK.isEmpty())
-      throw new Exception("\"break\" without \"while\" or \"do\" at line:"+atLine());
-    idx = BREAK.pop();
-    LOOP.pop();
   }
   //
   private FuzzyData buildFD(String fdN) throws Exception {
