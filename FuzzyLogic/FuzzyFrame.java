@@ -743,7 +743,7 @@ public abstract class FuzzyFrame {
   protected String commands[] = { "if", "else", "endif", "do", "with", "while", "endwhile",
                                   "break", "set", "double", "long", "int", "string", "then",
                                   "declare", "clear", "reset", "pause", "print", "remove",
-                                  "exit"
+                                  "continue", "exit"
                                 };
   // Operators
   protected String[] OPs = { "is", "+", "-", "*", "/", "=", "||", "==", ">=", "<=", "!=",
